@@ -1,53 +1,62 @@
-# skills
+# Skills
 
-Personal agent-skills collection. The repository layout mirrors a user-level
-skills directory (`~\.agents\skills\` or `~/.agents/skills/`): each skill is a
-folder with its own `SKILL.md` (plus reference docs and scripts), so you can
-copy individual skills into your own skills directory, or the whole tree at
-once.
+Personal agent-skills collection. The repository layout mirrors the official
+[anthropics/skills](https://github.com/anthropics/skills) convention: skills
+live under [`skills/`](skills), each self-contained in its own folder with a
+`SKILL.md` entry point, a `LICENSE.txt`, and any reference docs or scripts it
+needs. New skills start from the [`template/`](template) skeleton.
 
-## Layout
+> This repository contains my implementations of agent skills. For information
+> about the Agent Skills standard, see [agentskills.io](https://agentskills.io).
 
-```
-skills/
-└── chaoxing-homework/        # 超星学习通作业提交 end-to-end
-    ├── SKILL.md              # main flow: config table + 6 steps (completion criteria)
-    ├── REFERENCE.md          # deep-dive notes + failure-symptom quick table
-    ├── README.md             # per-skill readme (install/config/maintenance)
-    └── scripts/              # zero-dependency Node scripts (Node ≥22)
-```
+## About This Repository
 
-## Install (single skill)
+Each skill is a folder of instructions, scripts, and resources that an agent
+loads dynamically to perform a specialized task in a repeatable way. Skills
+range from practical workflow automation (Chaoxing homework submission) to
+whatever joins the collection next. Browse [`skills/`](skills) for the
+currently available skills, and copy individual folders into your own skills
+directory (`~/.agents/skills/` or equivalent) to use them.
+
+These skills are provided as-is for personal and educational use. The
+implementations target the sites and tools they describe; always test a skill
+in your own environment before relying on it.
+
+## Skill sets
+
+- [./skills](./skills) — all skills
+- [./skills/chaoxing-homework](./skills/chaoxing-homework) — 超星学习通
+  (Chaoxing) homework submission end-to-end: locate the work editor
+  (`doHomeWorkNew` / `reediter`), write the answer text, inject a zip/rar
+  attachment through the UEditor real-mouse flow, submit, and verify
+  (`submit=true`, status 待批阅). No absolute paths; configure the
+  `<placeholder>`s once before first use.
+
+## Installing a skill
+
+Copy one skill folder into your skills directory:
 
 ```powershell
-Copy-Item <repo>\chaoxing-homework <your-skills-dir>\ -Recurse
+Copy-Item <repo>\skills\chaoxing-homework <your-skills-dir>\ -Recurse
 ```
 
-Copy the whole collection instead with:
+Or copy the whole collection (skills + template):
 
 ```powershell
 Copy-Item <repo>\* <your-skills-dir>\ -Recurse
 ```
 
-## Skills
-
-- **[chaoxing-homework](chaoxing-homework/)** — submit or revise a homework
-  assignment on Chaoxing (超星学习通): locate the work editor (`doHomeWorkNew`
-  / `reediter`), write the answer text, upload a zip/rar attachment through the
-  UEditor real-mouse flow, submit, and verify (`submit=true`, status 待批阅).
-  Contains no absolute paths; configure the `<placeholder>`s once before first use.
-
 ## Conventions
 
-- Each skill folder is self-contained: `SKILL.md` is the entry point, and any
-  deep-dive material lives behind a pointer in a sibling file (progressive
-  disclosure per the [writing-for-agents](https://github.com/anthropics/anthropic-quickstarts)
-  conventions).
-- Steps carry explicit completion criteria; failure modes have a quick lookup
-  table so the flow is verifiable rather than hopeful.
-- No absolute paths, no environment-specific facts: everything environment-led
-  is a `<PLACEHOLDER>` documented at the top of each `SKILL.md`.
+- **Self-contained folders**: `SKILL.md` is the entry point; deep-dive
+  material lives behind a pointer in sibling files (progressive disclosure).
+- **Completion criteria**: steps in a `SKILL.md` carry explicit
+  "done" signals, and failure modes have a quick lookup table — the flow is
+  verifiable rather than hopeful.
+- **Portable**: no absolute paths and no environment-specific facts; anything
+  environment-led is a documented `<PLACEHOLDER>` at the top of each `SKILL.md`.
 
 ## License
 
-[MIT](LICENSE) © 2026 Bonger34
+MIT © 2026 Bonger34 — see [LICENSE](LICENSE). Each skill folder also carries an
+identical `LICENSE.txt`, matching the official per-skill convention.
