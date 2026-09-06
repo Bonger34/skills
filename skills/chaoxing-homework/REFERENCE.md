@@ -28,7 +28,7 @@
 
 ### 提交与验证
 
-- 页面底部两个按钮:"暂时保存" 与 "提交"(`a.btnSubmit.workBtnIndex`);点"提交"后弹"确认提交?"。
+- 页面底部两个按钮:"暂时保存" 与 "提交"——若两者类名接近(`a.btnSubmit` / `a.workBtnIndex`),一律**以文本过滤**区分(`e.textContent.trim()==='提交'`);点"提交"后弹"确认提交?"。
 - 弹窗按钮 `a.jb_btn`(文本"提交");用 filter text==='提交' 点它。
 - 成功特征:URL 追加 `submit=true`;状态"待批阅";答案区显示附件卡。
 - 已提交作业要重做:重新打开 doHomeWorkNew URL + `reediter()`,setContent 会覆盖旧内容。
@@ -50,7 +50,7 @@
 | `find-reediter` 输出空 / 顶层搜不到"修改答案" | 作业详情在 iframe 内;确认已在课程页点开目标作业,再跑递归脚本 |
 | `no attachment btn`(rect null) | 编辑器未渲染完成(多 tab 残留会匹配到别的作业页);等 2s 重试;确认第三参 workAnswerId 正确 |
 | 注入后 `hasCloud:false` | 面板未打开/输入未进编辑器;重试流程;确认 setContent 在注入**之前**执行 |
-| 点"提交"无弹窗 | 页面按钮点击后需 2-3s 出弹窗;弹窗按钮是 `a.jb_btn`(文本"提交"),不是页面底部 `a.btnSubmit.workBtnIndex` |
+| 点"提交"无弹窗 | 页面按钮点击后需 2-3s 出弹窗;弹窗按钮是 `a.jb_btn`(文本"提交");页面按钮用**文本过滤**避免点到"暂时保存" |
 | URL 无 `submit=true` | 提交未确认;重新点弹窗"提交"直至 URL 变化;以 URL 为准,别只看页面 |
 | 上传脚本报 `NO_UE` | 未命中目标编辑器(选了别的 tab/编辑器未初始化);用第三参 workAnswerId 重新对靶 |
 

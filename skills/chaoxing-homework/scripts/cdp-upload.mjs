@@ -5,6 +5,11 @@ const WS_URL = process.argv[2];
 const ZIP_PATH = process.argv[3];
 const WORK_ANSWER = process.argv[4] || ''; // 可选:优先匹配的 workAnswerId(多作业 tab 残留时区分)
 
+if (!WS_URL || !ZIP_PATH) {
+  console.error('USAGE: node cdp-upload.mjs <cdp-ws-url> <zip-or-rar-path> [workAnswerId]');
+  process.exit(1);
+}
+
 function connect(url) {
   return new Promise((resolve, reject) => {
     const ws = new WebSocket(url);
@@ -128,8 +133,9 @@ async function main() {
       console.log(JSON.stringify({ err: 'target editor not found (UE.instants.ueditorInstant0 missing) — check the workAnswerId matched target tab and that reediter() was called' }));
       process.exit(1);
     }
-    const chk = JSON.parse(contentCheck);
-    if (chk.hasCloud) break;
+    let chk = null;
+    try { chk = JSON.parse(contentCheck); } catch (e) { chk = null; }   // 页面返回异常时按"未达成"继续轮询
+    if (chk && chk.hasCloud) break;
   }
   console.log(JSON.stringify({ content: contentCheck }));
   // 上传判据(与 SKILL.md 一致):hasCloud 必须达成;否则以非零退出码提示自动化

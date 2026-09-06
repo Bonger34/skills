@@ -20,11 +20,11 @@ description: "Build an Android APK offline without Gradle, using the raw SDK too
 | `<KEYSTORE>` / `<KEYSTORE_PASS>` | 签名密钥库与密码(debug 库的密码通常 `android`) | 已有项目可复用(如第一个项目生成的 debug.keystore);无则 `keytool -genkeypair` 生成 |
 | `<ADB>` | adb 可执行文件 | `<ANDROID_HOME>/platform-tools/adb`(安装/校验 APK 时用) |
 
-环境前置:JDK 8 + JDK 11+(应仅 d8 用)、Android build-tools + platform、Node(验 dex 用可选)。
+环境前置:JDK 8 + JDK 11+(仅 d8 需要)、Android build-tools + platform、Node(验 dex 用可选)。
 
 ## 构建流程(7 步)
 
-每一步带**完成判据**;不满足即未完成。以 `scripts/build-template.ps1` 为骨架(复制到项目根运行);以下步骤可照抄执行(**路径占位符含空格时记得加双引号**),需先创建输出目录(模板已内置清理+创建):
+每一步带**完成判据**;不满足即未完成。以 `scripts/build-template.ps1` 为骨架(复制到项目根运行);以下步骤可照抄执行(**路径占位符含空格时记得加双引号**),需先创建输出目录(模板已内置清理+创建——每次构建前清理全部中间产物:res.zip、unsigned/aligned/签名 APK 及 gen/classes/dex,避免残留):
 
 ```
 <out>/gen、<out>/classes、<out>/dex   # 先创建;下次构建前清空,防陈旧产物
@@ -42,14 +42,14 @@ description: "Build an Android APK offline without Gradle, using the raw SDK too
 ```
 "<BUILD_TOOLS>/aapt2" link -o "<out>/<app>.unsigned.apk" -I "<PLATFORM_JAR>" --manifest "<manifest>" --java "<out>/gen" "<out>/res.zip"
 ```
-- **判据**:`*_unsigned.apk` 存在,且 `gen/<pkg>/R.java` 已生成(aapt2 link 成功的直接产物)。
+- **判据**:`*_unsigned.apk` 存在,且 `<out>/gen/<pkg>/R.java` 已生成(aapt2 link 成功的直接产物)。
 
 ### 3. Java 编译(javac,JDK 8)
 
 ```
 "<JAVA8_HOME>/bin/javac" -encoding UTF-8 -source 1.8 -target 1.8 -bootclasspath "<PLATFORM_JAR>" -d "<out>/classes" <src/*.java> <gen/R.java>
 ```
-- **判据**:全部源码编译无 error;`classes/<pkg>/*.class` 与匿名内部类 `$N.class` 存在。
+- **判据**:全部源码编译无 error;`classes/<pkg>/*.class` 与匿名内部类 `Outer$1.class` 形式存在。
 - **铁律:源码禁用 lambda/stream/方法引用**(JDK8 + bootclasspath android.jar 缺 LambdaMetafactory,报"找不到符号");监听一律匿名内部类。文件必须 UTF-8(中文注释)。
 
 ### 4. 转 dex(d8,JDK 21)
@@ -81,7 +81,7 @@ $env:JAVA_HOME = $old                                      # 用后恢复
 "<BUILD_TOOLS>/apksigner.bat" verify "<out>/<app>.apk"
 ```
 - **判据**:① verify 成功;② **APK 的 mtime 更新到本次构建时间**;③ 若怀疑内容陈旧(可选诊断):解压 classes.dex 后 `dexdump -d classes.dex | grep <新增字符串>`(Windows 用 `Select-String`)命中新代码特征串。
-- **已知陷阱:apksigner 在完整脚本上下文可能"静默失败"**(退出码 0 但 `--out` 未写文件;手动单行却成功)。防御:sig 前先 `Remove-Item <apk>`,让 `Test-Path` 检查暴露失败;命令一律单行(Windows PowerShell 5.1 反引号续行解析不可靠)。
+- **已知陷阱:apksigner 在完整脚本上下文可能"静默失败"**(退出码 0 但 `--out` 未写文件;手动单行却成功)。防御:sig 前先 `Remove-Item <apk>`,让 `Test-Path` 检查暴露失败;命令一律单行(Windows PowerShell 5.1 反引号续行解析不可靠)。私有密钥库建议 `--ks-pass env:KEYSTORE_PASS` 避免明文(debug 库 `pass:` 可接受)。
 
 ## 关键环境事实
 

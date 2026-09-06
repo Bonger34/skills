@@ -29,7 +29,7 @@ in your own environment before relying on it.
   (Chaoxing) homework submission end-to-end: locate the work editor
   (`doHomeWorkNew` / `reediter`), write the answer text, inject a zip/rar
   attachment through the UEditor real-mouse flow, submit, and verify
-  (`submit=true`, status 待批阅). No absolute paths; configure the
+  (`submit=true`, status 待批阅). No private machine paths; configure the
   `<placeholder>`s once before first use.
 - [./skills/android-offline-build](./skills/android-offline-build) — build a
   signed Android APK without Gradle (aapt2 → JDK8 javac vs android.jar → d8 →
@@ -52,11 +52,11 @@ Copy-Item <repo>\skills\chaoxing-homework <your-skills-dir>\ -Recurse
 Or copy the whole collection (all skills + the template):
 
 ```powershell
-Copy-Item <repo>\skills <your-skills-dir>\ -Recurse   # 技能夹
-Copy-Item <repo>\template <your-skills-dir>\ -Recurse # 新技能骨架(可选)
+Copy-Item <repo>\skills <your-skills-dir>\ -Recurse   # all skill folders
+Copy-Item <repo>\template <your-skills-dir>\ -Recurse # new-skill skeleton (optional)
 ```
 
-Each skill folder is self-contained (`SKILL.md` + `LICENSE.txt` + reference/scripts), so folders can be copied on their own. Repository metadata (`.gitattributes`, `.gitignore`, root `LICENSE`, `README.md`) is not part of any skill.
+Each skill folder is self-contained (`SKILL.md` + `LICENSE.txt` + reference/scripts), so folders can be copied on their own. Repository metadata (`.gitattributes`, `.gitignore`, root `LICENSE`, `README.md`) is not part of any skill. When scaffolding a new skill from [`template/`](template), also add an identical `LICENSE.txt` next to its `SKILL.md`.
 
 ## Conventions
 
@@ -69,6 +69,9 @@ Each skill folder is self-contained (`SKILL.md` + `LICENSE.txt` + reference/scri
   environment-led is a documented `<PLACEHOLDER>` at the top of each `SKILL.md`
   (vendor-default locations like the WinRAR install path are named as such,
   not hardcoded to a person's machine).
+- **Windows-oriented**: the skills target Windows hosts (PowerShell, Android
+  SDK `.bat` tooling, WinRAR); cross-platform alternatives are noted in the
+  per-skill `REFERENCE.md` where they exist.
 
 ## License
 

@@ -45,7 +45,7 @@ async function main() {
   if (cands.length > 1 && !(WANT_COURSE && cands.some(t => t.url.includes('courseId=' + WANT_COURSE)))) {
     console.log('WARN: 多个课程页,已选第一个;如选错可传 courseId 参数精确匹配');
   }
-  if (!page) { console.log('NO PAGE'); ws.close(); return; }
+  if (!page) { console.log('NO PAGE — 打开课程页后再试'); ws.close(); process.exit(1); }
   console.log('PAGE:', page.url.slice(0, 150));
 
   const { sessionId } = await send('Target.attachToTarget', { targetId: page.targetId, flatten: true });
@@ -55,6 +55,7 @@ async function main() {
     (async () => {
       const results = [];
       const seen = new Set();
+      let crossCount = 0;   // 统计被跳过的跨域 iframe
       async function walk(doc, depth) {
         let loc = '';
         try { loc = doc.location.href || ''; } catch (e) { loc = '(cross)'; }
@@ -79,16 +80,18 @@ async function main() {
           try {
             const cd = f.contentDocument;
             if (cd && !seen.has(cd)) { seen.add(cd); await walk(cd, depth + 1); }
-          } catch (e) {}
+          } catch (e) { crossCount++; }   // 跨域 iframe 无法访问,跳过并计数
         }
       }
       seen.add(document);
       await walk(document, 0);
-      return { count: results.length, results: results.slice(0, 20) };
+      return { count: results.length, results: results.slice(0, 20), cross: crossCount };
     })()
   `;
   const out = await evalIn(sessionId, probe);
+  if (out.cross) console.log('INFO: 跳过 ' + out.cross + ' 个跨域 iframe(同源遍历;跨域内容需 target 级会话)');
   console.log('COUNT:', out.count);
+  if (!out.count) { console.log('NO MATCH — 未找到"修改答案"链接(确认已打开作业详情)'); ws.close(); process.exit(1); }
   for (const r of out.results) {
     console.log('--- depth', r.depth, '|', r.tag, '|', r.txt);
     console.log('  url:', r.url);
@@ -100,4 +103,4 @@ async function main() {
 }
 
 ws.onerror = (e) => { console.error('WS ERROR: cannot connect to CDP URL — re-fetch with `agent-browser get cdp-url` and retry;', e.message || ''); process.exit(1); };
-ws.onopen = () => { main().catch((e) => { console.log('ERR', e.message); ws.close(); }); };
+ws.onopen = () => { main().catch((e) => { console.error('ERR', e.message); ws.close(); process.exit(1); }); };

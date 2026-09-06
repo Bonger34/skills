@@ -21,7 +21,11 @@ $OUT  = "$PROJ\build"
 $KS     = "<KEYSTORE>"
 $KSPASS = "<KEYSTORE_PASS>"                # debug 密钥库默认 android
 
-# 先清理中间产物:源码删除后旧 .class/.dex 不得残留(否则"改代码没生效")
+# 先清理全部产物:旧 res.zip/unsigned/aligned/签名 APK 连同中间目录一并清除,
+# 保证重跑从干净状态开始(避免 aapt2 link 不覆盖与 zip Update 重复条目)
+foreach ($f in @("$OUT\res.zip","$OUT\$APK.unsigned.apk","$OUT\$APK.aligned.apk","$OUT\$APK.apk","$OUT\$APK.apk.idsig")) {
+  if (Test-Path $f) { Remove-Item $f -Force }
+}
 foreach ($d in @("$OUT\gen","$OUT\classes","$OUT\dex")) {
   if (Test-Path $d) { Remove-Item $d -Recurse -Force }
   New-Item -ItemType Directory -Force -Path $d | Out-Null

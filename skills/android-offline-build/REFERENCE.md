@@ -2,6 +2,13 @@
 
 > 由 SKILL.md 指针到达;只在需要细节时读取。全部经验经多个课程作业项目实战验证。
 
+| 占位符 | 含义(同 SKILL.md 配置表) |
+|---|---|
+| `<ANDROID_HOME>` / `<BUILD_TOOLS>` / `<PLATFORM_JAR>` | Android SDK 根 / build-tools 版本 / 平台 android.jar |
+| `<JAVA8_HOME>` / `<JAVA21_HOME>` | javac(8)与 d8(11+)所需 JDK |
+| `<KEYSTORE>` / `<KEYSTORE_PASS>` | 签名密钥库与密码(debug 库默认 `android`) |
+| `<ADB>` | adb 可执行(安装/校验 APK 时用) |
+
 ## 诊断与验证命令
 
 | 目的 | 命令 |
