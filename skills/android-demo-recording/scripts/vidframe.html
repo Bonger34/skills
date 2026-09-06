@@ -11,20 +11,23 @@ const v = document.getElementById('v');
 const times = [4, 8, 12, 16, 20, 24, 28];
 v.addEventListener('loadedmetadata', async () => {
   const grid = document.getElementById('grid');
+  // 画布按视频真实比例缩放(宽 270,高按比例);标签打印实际取帧时刻,便于核对
+  const H = Math.round(270 * v.videoHeight / v.videoWidth);
   for (const t of times) {
     await new Promise(r => { v.currentTime = t; v.onseeked = r; });
+    const actual = v.currentTime;
     const wrap = document.createElement('div');
     wrap.style.cssText = 'display:inline-block;margin:4px;text-align:center';
     const c = document.createElement('canvas');
-    c.width = 270; c.height = 600;
+    c.width = 270; c.height = H;
     c.style.cssText = 'border:1px solid #333;display:block';
     c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
     const cap = document.createElement('div');
-    cap.textContent = 't=' + t + 's';
+    cap.textContent = 't=' + t + 's (thumb=' + actual.toFixed(2) + ')';
     wrap.appendChild(c); wrap.appendChild(cap);
     grid.appendChild(wrap);
   }
-  document.getElementById('info').textContent = 'DONE frames=' + times.length;
+  document.getElementById('info').textContent = 'DONE frames=' + times.length + ' dur=' + v.duration.toFixed(2) + 's';
 });
 </script>
 </body>

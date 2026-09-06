@@ -62,8 +62,10 @@ Copy-Item <repo>\* <your-skills-dir>\ -Recurse
 - **Completion criteria**: steps in a `SKILL.md` carry explicit
   "done" signals, and failure modes have a quick lookup table — the flow is
   verifiable rather than hopeful.
-- **Portable**: no absolute paths and no environment-specific facts; anything
-  environment-led is a documented `<PLACEHOLDER>` at the top of each `SKILL.md`.
+- **Portable**: no private machine paths or personal data; anything
+  environment-led is a documented `<PLACEHOLDER>` at the top of each `SKILL.md`
+  (vendor-default locations like the WinRAR install path are named as such,
+  not hardcoded to a person's machine).
 
 ## License
 

@@ -5,7 +5,7 @@ description: "Record a clean demo video of an Android app on an emulator for cou
 
 # Android 演示录制(android-demo-recording)
 
-在模拟器上录制"干净、完整、可验证"的 Android 应用演示视频:启动与配置模拟器 → 中文文本注入 → 坐标采集 → 设计录制序列 → screenrecord 录制 → 逐帧验证。沉淀自 5 轮实战录制的全部坑(ANR 吞点击、软键盘位移、screenrecord 提前截止等)。
+在模拟器上录制"干净、完整、可验证"的 Android 应用演示视频:启动与配置模拟器 → 中文文本注入 → 坐标采集 → 设计录制序列 → screenrecord 录制 → 逐帧验证。沉淀自作业3/4/5 系列多轮录制实战的全部坑(ANR 吞点击、软键盘位移、screenrecord 提前截止等)。
 
 ## 首次使用前的配置
 
@@ -39,7 +39,7 @@ description: "Record a clean demo video of an Android app on an emulator for cou
 <ADB> shell settings put global animator_duration_scale 0
 ```
 - 冷启动常出现 **SystemUI ANR 弹窗**:症状=状态栏时间冻结、截图不变。处理:`uiautomator dump` 找"等待"按钮(每次以 dump 为准;实测常见中心约 (540,1367))点掉;顽固则 `am force-stop com.android.systemui` 或重启模拟器。
-- **判据**:`dumpsys window | grep mCurrentFocus` 焦点在被测应用/桌面,**不是** "Application Not Responding"。
+- **判据**:`adb shell "dumpsys window | grep mCurrentFocus"`(或 Windows 主机上 `dumpsys window` 全量后用 `Select-String` 过滤)焦点在被测应用/桌面,**不是** "Application Not Responding"。
 
 ### 3. 中文输入配置(仅演示需要中文时)
 
@@ -63,6 +63,7 @@ description: "Record a clean demo video of an Android app on an emulator for cou
 - 首个操作放 real t≥6s(录屏自动增益窗口,开头几秒画面/操作会丢)。
 - `screenrecord --time-limit` **必须大于操作序列总耗时**(每条 adb 命令自身有延迟,实测 20 条命令 ≈90s;不足则视频在操作完成前截止、"结尾不完整")。
 - 重要状态(Toast LENGTH_LONG、结果面板)在序列里给足展示时间,结尾步骤后留 ≥5s 空镜。
+- **判据**:序列脚本完整(每个输入动作都有坐标/文本与间隔)且 `time-limit ≥ (sleep 总和 + 命令数 × 0.7s + 结尾停留 10s) × 1.2`(公式见 REFERENCE)。
 
 ### 6. 录制与驱动
 

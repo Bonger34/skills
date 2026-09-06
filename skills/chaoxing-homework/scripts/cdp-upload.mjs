@@ -33,6 +33,8 @@ function connect(url) {
   });
 }
 
+// UEditor 附件按钮位于顶层文档(工具栏不嵌套 iframe),顶层查询即可;
+// 若未来 UEditor 结构变化导致找不到按钮,可复用下方 FIND_INPUT 的 walk 递归。
 const GET_RECT = `(function(){var b=document.querySelector('.edui-for-attachment_new');if(!b)return null;var r=b.getBoundingClientRect();return {x:Math.round(r.left+r.width/2),y:Math.round(r.top+r.height/2)}})()`;
 
 const FIND_INPUT = `(function(){
@@ -122,6 +124,10 @@ async function main() {
       returnByValue: true
     }, sessionId);
     contentCheck = (cr.result && cr.result.value) || 'null';
+    if (String(contentCheck) === 'NO_UE') {
+      console.log(JSON.stringify({ err: 'target editor not found (UE.instants.ueditorInstant0 missing) — check the workAnswerId matched target tab and that reediter() was called' }));
+      process.exit(1);
+    }
     const chk = JSON.parse(contentCheck);
     if (chk.hasCloud) break;
   }

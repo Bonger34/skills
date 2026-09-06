@@ -34,9 +34,9 @@ description: "Submit or revise a homework assignment on Chaoxing (超星学习�
 
 ### 2. 打开编辑页并激活编辑器
 
-- `agent-browser --session <SESSION_NAME> tab new "<URL>"` → 切到该 tab(`tab tN`,id 格式不是数字)。
+- `agent-browser --session <SESSION_NAME> tab new "<URL>"` → 以 `tab list` 输出的稳定 id(如 `t3`)切换到该 tab。
 - 新开页面默认是"查看"视图,但已定义 `reediter` → `eval "reediter(); 'called'"` 切编辑态。
-- **判据**:`eval "typeof UE !== 'undefined' && !!UE.instants.ueditorInstant0"` 返回 `edit=true`(注意是**对象键** `UE.instants.ueditorInstant0`,不是数组索引)。
+- **判据**:`eval "typeof UE !== 'undefined' && !!UE.instants.ueditorInstant0"` 输出布尔 `true`(注意是**对象键** `UE.instants.ueditorInstant0`,不是数组索引)。
 
 ### 3. 写入文字答案
 

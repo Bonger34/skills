@@ -1,4 +1,5 @@
 # 离线 Android APK 构建模板(无 Gradle;替换下方 <...> 配置即可使用)
+# 注意:本脚本需复制到**项目根目录**再运行($PROJ 取自脚本所在目录)
 # 流程:aapt2 compile -> aapt2 link(生成 R.java)-> javac(JDK8)-> d8(JDK21) -> zipalign -> apksigner
 $ErrorActionPreference = "Stop"
 
@@ -16,11 +17,15 @@ $PROJ = $PSScriptRoot                     # 脚本所在目录 = 项目根
 $RES  = "$PROJ\res"
 $SRC  = "$PROJ\src"
 $OUT  = "$PROJ\build"
-# ====== 签名(debug 密钥) ======
-$KS    = "<KEYSTORE>"
-$KSPASS = "android"
+# ====== 签名(debug 密钥;私有库请改 KEYSTORE_PASS) ======
+$KS     = "<KEYSTORE>"
+$KSPASS = "<KEYSTORE_PASS>"                # debug 密钥库默认 android
 
-New-Item -ItemType Directory -Force -Path "$OUT\obj","$OUT\gen","$OUT\classes","$OUT\dex" | Out-Null
+# 先清理中间产物:源码删除后旧 .class/.dex 不得残留(否则"改代码没生效")
+foreach ($d in @("$OUT\obj","$OUT\gen","$OUT\classes","$OUT\dex")) {
+  if (Test-Path $d) { Remove-Item $d -Recurse -Force }
+  New-Item -ItemType Directory -Force -Path $d | Out-Null
+}
 
 # 1) 编译资源
 & "$BT\aapt2.exe" compile --dir "$RES" -o "$OUT\res.zip"

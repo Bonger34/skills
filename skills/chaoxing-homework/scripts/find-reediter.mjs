@@ -37,9 +37,11 @@ async function evalIn(sessionId, expr) {
 
 async function main() {
   const { targetInfos } = await send('Target.getTargets', {});
-  let page = null;
-  for (const t of targetInfos) {
-    if (t.type === 'page' && (t.url.includes('studentstudy') || t.url.includes('knowledge/cards'))) { page = t; break; }
+  // 多课程页同时打开时优先 courseId=241169786 的目标;否则取第一个 studentstudy 页并打印提示
+  const cands = targetInfos.filter(t => t.type === 'page' && (t.url.includes('studentstudy') || t.url.includes('knowledge/cards')));
+  let page = cands.find(t => t.url.includes('courseId=241169786')) || cands[0] || null;
+  if (cands.length > 1 && !cands.some(t => t.url.includes('courseId=241169786'))) {
+    console.log('WARN: 多个课程页,选中第一个;期望 URL 含 courseId=241169786');
   }
   if (!page) { console.log('NO PAGE'); ws.close(); return; }
   console.log('PAGE:', page.url.slice(0, 150));
@@ -95,4 +97,5 @@ async function main() {
   ws.close();
 }
 
+ws.onerror = (e) => { console.error('WS ERROR: cannot connect to CDP URL — re-fetch with `agent-browser get cdp-url` and retry;', e.message || ''); process.exit(1); };
 ws.onopen = () => { main().catch((e) => { console.log('ERR', e.message); ws.close(); }); };

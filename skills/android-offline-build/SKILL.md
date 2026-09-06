@@ -5,7 +5,7 @@ description: "Build an Android APK offline without Gradle, using the raw SDK too
 
 # Android 离线构建(android-offline-build)
 
-无 Gradle 环境下用 SDK 原始工具链构建并签名 Android APK:aapt2 编译/链接资源 → JDK8 javac(以 android.jar 为 bootclasspath)→ d8 转 dex → zipalign → apksigner。沉淀自 app1-7 共 7 个项目的实战,含全部踩坑与验证手段。
+无 Gradle 环境下用 SDK 原始工具链构建并签名 Android APK:aapt2 编译/链接资源 → JDK8 javac(以 android.jar 为 bootclasspath)→ d8 转 dex → zipalign → apksigner。沉淀自 7 个 Android 课程 APP 项目的实战(app1-7,作业1-5 系列),含全部踩坑与验证手段。
 
 ## 首次使用前的配置
 
@@ -17,13 +17,18 @@ description: "Build an Android APK offline without Gradle, using the raw SDK too
 | `<BUILD_TOOLS>` | build-tools 版本目录(如 `36.0.0`) | `ls <ANDROID_HOME>/build-tools/` |
 | `<PLATFORM_JAR>` | 平台 android.jar | `<ANDROID_HOME>/platforms/android-XX/android.jar`(targetSdk 对应) |
 | `<JAVA8_HOME>` / `<JAVA21_HOME>` | JDK 8 / JDK 21 安装根 | javac 用 8;d8 需要 JDK 11+ |
-| `<KEYSTORE>` | 签名密钥库(debug 即可,密码一般 `android`/`android`) | 已有项目可复用;无则 `keytool -genkeypair` 生成 |
+| `<KEYSTORE>` / `<KEYSTORE_PASS>` | 签名密钥库与密码(debug 库的密码通常 `android`) | 已有项目可复用(如第一个项目生成的 debug.keystore);无则 `keytool -genkeypair` 生成 |
+| `<ADB>` | adb 可执行文件 | `<ANDROID_HOME>/platform-tools/adb`(安装/校验 APK 时用) |
 
 环境前置:JDK 8 + JDK 11+(应仅 d8 用)、Android build-tools + platform、Node(验 dex 用可选)。
 
 ## 构建流程(7 步)
 
-每一步带**完成判据**;不满足即未完成。
+每一步带**完成判据**;不满足即未完成。以 `scripts/build-template.ps1` 为骨架(复制到项目根运行);以下步骤可照抄执行,需先创建输出目录(模板已内置清理+创建):
+
+```
+<out>/obj、<out>/gen、<out>/classes、<out>/dex   # 先创建;下次构建前清空,防陈旧产物
+```
 
 ### 1. 资源编译(aapt2 compile)
 
@@ -50,10 +55,12 @@ description: "Build an Android APK offline without Gradle, using the raw SDK too
 ### 4. 转 dex(d8,JDK 21)
 
 ```
-$env:JAVA_HOME = <JAVA21_HOME>   # d8 需要 JDK 11+,JDK8 下会失败
+$old = $env:JAVA_HOME
+$env:JAVA_HOME = <JAVA21_HOME>                            # d8 需要 JDK 11+,JDK8 下会失败
 <BUILD_TOOLS>/d8.bat --release --lib <PLATFORM_JAR> --min-api 23 --output <out>/dex <classes...>
+$env:JAVA_HOME = $old                                      # 用后恢复
 ```
-- **判据**:`dex/classes.dex` 生成;`--min-api` 与项目 minSdk 一致。用后恢复原 `JAVA_HOME`。
+- **判据**:`dex/classes.dex` 生成;`--min-api` 与项目 minSdk 一致;JAVA_HOME 已恢复(模板用 try/finally 保证)。
 
 ### 5. 合并 dex
 
@@ -70,10 +77,10 @@ $env:JAVA_HOME = <JAVA21_HOME>   # d8 需要 JDK 11+,JDK8 下会失败
 ### 7. 签名 + 防御(apksigner)
 
 ```
-<BUILD_TOOLS>/apksigner.bat sign --ks <KEYSTORE> --ks-pass pass:android --key-pass pass:android --out <out>/<app>.apk <out>/<app>.aligned.apk
+<BUILD_TOOLS>/apksigner.bat sign --ks <KEYSTORE> --ks-pass pass:<KEYSTORE_PASS> --key-pass pass:<KEYSTORE_PASS> --out <out>/<app>.apk <out>/<app>.aligned.apk
 <BUILD_TOOLS>/apksigner.bat verify <out>/<app>.apk
 ```
-- **判据**:① verify 成功;② **APK 的 mtime 更新到本次构建时间**;③ 若怀疑内容陈旧:`dexdump -d <apk内classes.dex> | grep <新增字符串>` 命中新代码特征串。
+- **判据**:① verify 成功;② **APK 的 mtime 更新到本次构建时间**;③ 若怀疑内容陈旧:解压 classes.dex 后 `dexdump -d classes.dex | grep <新增字符串>`(Windows 用 `Select-String`)命中新代码特征串。
 - **已知陷阱:apksigner 在完整脚本上下文可能"静默失败"**(退出码 0 但 `--out` 未写文件;手动单行却成功)。防御:sig 前先 `Remove-Item <apk>`,让 `Test-Path` 检查暴露失败;命令一律单行(Windows PowerShell 5.1 反引号续行解析不可靠)。
 
 ## 关键环境事实
