@@ -31,6 +31,15 @@ in your own environment before relying on it.
   attachment through the UEditor real-mouse flow, submit, and verify
   (`submit=true`, status 待批阅). No absolute paths; configure the
   `<placeholder>`s once before first use.
+- [./skills/android-offline-build](./skills/android-offline-build) — build a
+  signed Android APK without Gradle (aapt2 → JDK8 javac vs android.jar → d8 →
+  zipalign → apksigner), with per-step completion criteria and the
+  silent-signature-failure defense. Ships a parameterized `build-template.ps1`.
+- [./skills/android-demo-recording](./skills/android-demo-recording) — record a
+  clean, complete demo video of an Android app on an emulator: SystemUI-ANR
+  recovery, Chinese text input (`hw.keyboard=no` + ADBKeyboard), uiautomator
+  coordinates, screenrecord time-budget math, and frame-by-frame verification
+  (`durcheck.html` / `vidframe.html`).
 
 ## Installing a skill
 

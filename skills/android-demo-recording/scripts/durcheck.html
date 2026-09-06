@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>durcheck</title></head>
+<body>
+<!-- 用法: 改 src, file:// 打开, 页面显示 DUR=秒数; 短于预期即录制被截断 -->
+<video id="v" src="../demo.mp4" onloadedmetadata="document.getElementById('info').textContent='DUR='+v.duration"></video>
+<div id="info">loading</div>
+</body>
+</html>
