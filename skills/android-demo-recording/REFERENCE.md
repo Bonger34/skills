@@ -47,3 +47,5 @@
 | 视频比预期短、结尾停在对话框 | time-limit 小于序列耗时;加大重录 |
 | `exec-out screencap > file` 出来是坏图 | PowerShell 重定向;改用设备内截图+pull |
 | 文字录入到错误控件 | 字段间用 dump 焦点确认;输入后核对 dump 文本 |
+| screenrecord 立即退出/视频极短 | `/sdcard` 存储不足:`df /sdcard` 检查,清理或改录到 `/data/local/tmp` |
+| `uiautomator dump` 报 `UiAutomation not connected` | 刚发生过 ANR/系统不稳;等 10s 重试或重启 adb → 复用 ANR 处置 |

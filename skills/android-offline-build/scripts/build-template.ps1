@@ -22,7 +22,7 @@ $KS     = "<KEYSTORE>"
 $KSPASS = "<KEYSTORE_PASS>"                # debug 密钥库默认 android
 
 # 先清理中间产物:源码删除后旧 .class/.dex 不得残留(否则"改代码没生效")
-foreach ($d in @("$OUT\obj","$OUT\gen","$OUT\classes","$OUT\dex")) {
+foreach ($d in @("$OUT\gen","$OUT\classes","$OUT\dex")) {
   if (Test-Path $d) { Remove-Item $d -Recurse -Force }
   New-Item -ItemType Directory -Force -Path $d | Out-Null
 }

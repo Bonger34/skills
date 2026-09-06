@@ -1,9 +1,11 @@
 // 递归遍历 iframe 树,寻找"修改答案"元素及其所在文档 URL(支持 flatten sessionId)
 // 用途:从学习通课程页(studentstudy / knowledge/cards)定位任意作业的编辑页(doHomeWorkNew)完整 URL
-// 用法: node find-reediter.mjs <cdp-ws-url>
+// 用法: node find-reediter.mjs <cdp-ws-url> [courseId]
+//   courseId(可选):多课程页同时打开时用于精确选页;缺省取第一个 studentstudy 页。
+//   注意:输出中的 URL 位于 href / parentHTML 字段(href 即"修改答案"链接指向的编辑页地址)。
 //   前提:agent-browser --session <SESSION_NAME> 已打开目标作业的课程页(并在目录中点开作业详情)
-//   输出:COUNT + 每个匹配项的 depth/url/onclick(含 reediter)/parentHTML;url 即编辑页地址
 const url = process.argv[2];
+const WANT_COURSE = process.argv[3] || '';   // 可选:期望的 courseId,不硬编码
 const ws = new WebSocket(url);
 let id = 0;
 const pending = new Map();
@@ -37,11 +39,11 @@ async function evalIn(sessionId, expr) {
 
 async function main() {
   const { targetInfos } = await send('Target.getTargets', {});
-  // 多课程页同时打开时优先 courseId=241169786 的目标;否则取第一个 studentstudy 页并打印提示
+  // 多课程页同时打开时按用户传入的 courseId 精确选页;缺省取第一个并提示
   const cands = targetInfos.filter(t => t.type === 'page' && (t.url.includes('studentstudy') || t.url.includes('knowledge/cards')));
-  let page = cands.find(t => t.url.includes('courseId=241169786')) || cands[0] || null;
-  if (cands.length > 1 && !cands.some(t => t.url.includes('courseId=241169786'))) {
-    console.log('WARN: 多个课程页,选中第一个;期望 URL 含 courseId=241169786');
+  let page = (WANT_COURSE ? cands.find(t => t.url.includes('courseId=' + WANT_COURSE)) : null) || cands[0] || null;
+  if (cands.length > 1 && !(WANT_COURSE && cands.some(t => t.url.includes('courseId=' + WANT_COURSE)))) {
+    console.log('WARN: 多个课程页,已选第一个;如选错可传 courseId 参数精确匹配');
   }
   if (!page) { console.log('NO PAGE'); ws.close(); return; }
   console.log('PAGE:', page.url.slice(0, 150));

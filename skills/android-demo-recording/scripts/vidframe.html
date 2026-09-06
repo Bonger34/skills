@@ -14,7 +14,14 @@ v.addEventListener('loadedmetadata', async () => {
   // 画布按视频真实比例缩放(宽 270,高按比例);标签打印实际取帧时刻,便于核对
   const H = Math.round(270 * v.videoHeight / v.videoWidth);
   for (const t of times) {
-    await new Promise(r => { v.currentTime = t; v.onseeked = r; });
+    // 钳制到时长内,避免超长目标导致 seeked 永不触发而挂起;3s 超时兜底(标签跳过)
+    const target = Math.min(Math.max(t, 0), Math.max(0, v.duration - 0.05));
+    await new Promise(r => {
+      const done = () => { v.removeEventListener('seeked', done); r(); };
+      v.addEventListener('seeked', done);
+      v.currentTime = target;
+      setTimeout(done, 3000);
+    });
     const actual = v.currentTime;
     const wrap = document.createElement('div');
     wrap.style.cssText = 'display:inline-block;margin:4px;text-align:center';

@@ -49,11 +49,14 @@ Copy one skill folder into your skills directory:
 Copy-Item <repo>\skills\chaoxing-homework <your-skills-dir>\ -Recurse
 ```
 
-Or copy the whole collection (skills + template):
+Or copy the whole collection (all skills + the template):
 
 ```powershell
-Copy-Item <repo>\* <your-skills-dir>\ -Recurse
+Copy-Item <repo>\skills <your-skills-dir>\ -Recurse   # 技能夹
+Copy-Item <repo>\template <your-skills-dir>\ -Recurse # 新技能骨架(可选)
 ```
+
+Each skill folder is self-contained (`SKILL.md` + `LICENSE.txt` + reference/scripts), so folders can be copied on their own. Repository metadata (`.gitattributes`, `.gitignore`, root `LICENSE`, `README.md`) is not part of any skill.
 
 ## Conventions
 

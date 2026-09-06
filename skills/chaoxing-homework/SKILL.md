@@ -13,11 +13,13 @@ description: "Submit or revise a homework assignment on Chaoxing (超星学习�
 
 | 占位符 | 含义 | 获取方式 |
 |---|---|---|
-| `<SESSION_NAME>` | agent-browser 会话名(如 `chaoxing-hw`) | 任意,建议固定一个长度适中且与任务无关的名字 |
+| `<SESSION_NAME>` | agent-browser 会话名(示例 `my-session`) | 任意,建议固定一个长度适中且与任务无关的名字 |
 | `<SESSION_DIR>` | 会话 socket 目录 | 你为 agent-browser 配置的目录;每次新 shell 需 `$env:AGENT_BROWSER_SOCKET_DIR=<SESSION_DIR>` |
 | `<PROFILE_DIR>` | 浏览器登录 profile | 你为 agent-browser 配置的用户数据目录(含学习通登录态) |
 | `<COURSE_ID>` / `<CLASS_ID>` | 学习通课程/班级 ID | 课程页 URL 参数 courseId / clazzid |
 | `<CDP_URL>` | 浏览器 CDP 地址 | `agent-browser get cdp-url`,**每次现取,勿写死** |
+| `<host>` | 学习通域名(示例 `mooc1.chaoxing.com`) | 从课程/作业页 URL 提取;运行时值,非配置 |
+| `<URL>` | 编辑页完整 URL | 第 1 步脚本输出后取出;运行时值,非配置 |
 
 环境前置:agent-browser(≥0.36)、Node ≥22(内置 WebSocket,脚本零依赖)。
 
@@ -29,8 +31,8 @@ description: "Submit or revise a homework assignment on Chaoxing (超星学习�
 
 - 前置:会话存活、登录态有效;**所有命令带 `--session <SESSION_NAME>`**,否则会连到空 default 实例。
 - 课程页(`studentstudy` URL,chapterId 指向目标章节点)右侧目录点作业,或用 `getTeacherAjax('<COURSE_ID>','<CLASS_ID>','<chapterId>')` 切章节(chapterId 从目录节点的 `id="cur<xx>"` 或点击后的 URL 提取)。
-- 作业详情在 iframe 里,顶层 DOM 搜不到"修改答案"链接 → 运行 `node scripts/find-reediter.mjs <CDP_URL>`(递归 iframe 树,自动 attach+enable+walk),输出该链接的完整 URL(`doHomeWorkNew?workAnswerId=...&workId=...&enc=...`)与 `onclick="reediter()"`。
-- **判据**:拿到形如 `https://<host>/mooc-ans/work/doHomeWorkNew?courseId=...&workAnswerId=...&workId=...` 的完整 URL,且 workId/workAnswerId 与题目页一致。
+- 作业详情在 iframe 里,顶层 DOM 搜不到"修改答案"链接 → 运行 `node scripts/find-reediter.mjs <CDP_URL> [<COURSE_ID>]`(递归 iframe 树,自动 attach+enable+walk;多课程页时传 courseId 精确选页),输出该链接的完整 URL 与 `onclick="reediter()"`。编辑页 URL 在输出的 **`href` 或 `parentHTML` 字段**(`doHomeWorkNew?workAnswerId=...&workId=...&enc=...`)。
+- **判据**:取到含 `doHomeWorkNew?courseId=...&workAnswerId=...&workId=...` 的完整 URL,且 workId/workAnswerId 与题目页一致。
 
 ### 2. 打开编辑页并激活编辑器
 
@@ -75,4 +77,4 @@ description: "Submit or revise a homework assignment on Chaoxing (超星学习�
 | 成功标志 | URL `submit=true`;状态"待批阅" |
 | 多 tab 残留 | cdp-upload.mjs 第三参数传 workAnswerId |
 
-细节与深坑(CDP 协议要点、zip/rar 打包、模拟器录制、Android 离线构建陷阱)见 [REFERENCE.md](REFERENCE.md),按需读取。
+网页操作细节(CDP 协议要点、编辑器/附件、打包)与故障速查见 [REFERENCE.md](REFERENCE.md);模拟器录制与 Android 离线构建的深坑见 [android-demo-recording](android-demo-recording) / [android-offline-build](android-offline-build) 技能(需要时另复制)。

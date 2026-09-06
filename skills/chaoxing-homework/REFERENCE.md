@@ -61,5 +61,5 @@
 
 ## 相关技能
 
-- 模拟器演示录制(ANR 处置、中文输入、screenrecord、逐帧验证):见 **android-demo-recording** 技能(需一并复制)。
-- Android 离线构建(无 Gradle 全链路、apksigner 静默失败):见 **android-offline-build** 技能(需一并复制)。
+- 模拟器演示录制(ANR 处置、中文输入、screenrecord、逐帧验证):如需要该能力,另复制 **android-demo-recording** 技能夹。
+- Android 离线构建(无 Gradle 全链路、apksigner 静默失败):如需要该能力,另复制 **android-offline-build** 技能夹。

@@ -14,7 +14,7 @@ description: "Record a clean demo video of an Android app on an emulator for cou
 | `<ANDROID_HOME>` | Android SDK 根目录(含 emulator/platform-tools) |
 | `<AVD_NAME>` / `<AVD_CONFIG>` | 模拟器 AVD 名及其 `config.ini` 路径 |
 | `<ADB>` | adb 可执行(通常 `<ANDROID_HOME>/platform-tools/adb`) |
-| `<ADBKEYBOARD_APK>` | ADBKeyboard APK 路径(开源,github 搜索 ADBKeyBoard,根目录有编译好的 apk) |
+| `<ADBKEYBOARD_APK>` | ADBKeyboard APK 路径(开源;官方仓库 `github.com/senzhk/ADBKeyBoard`,根目录有编译好的 `ADBKeyboard.apk`) |
 | `<APP_PKG>` | 被测应用包名(如 `com.example.demoapp`) |
 
 环境前置:Android SDK + 至少一个 AVD(建议 1080x2400)、adb、ADBKeyboard APK、浏览器(帧验证页,可选)。
@@ -72,13 +72,15 @@ description: "Record a clean demo video of an Android app on an emulator for cou
 # ……按序列执行 input tap / input text / am broadcast / input swipe(长按=同点 600ms)……
 <ADB> pull /sdcard/demo.mp4 <local>
 ```
+- `<N>` 取值自第 5 阶段判据公式(≥ 序列总耗时 × 1.2)。
+- 拉回后把 `demo.mp4` 放到技能目录(`scripts/` 的上级)或改两个验证页的 `src`。
 - **判据**:拉回后立刻看时长(见第 7 阶段);时长不足预期或疑被截断 → 加大 time-limit 重录。
 
 ### 7. 时长校验与逐帧验证
 
-- 时长:`scripts/durcheck.html`(file:// 打开,`document.getElementById('info').textContent` 显示 `DUR=...`);吻合则继续。
+- 时长:`scripts/durcheck.html`(file:// 打开,`document.getElementById('info').textContent` 显示 `DUR=...`;`src` 默认相对上一级 `../demo.mp4`,视频需放在同目录或手动改 `src`);吻合则继续。
 - 帧验证:`scripts/vidframe.html`(改 `times` 数组;canvas 逐帧渲染;单页截图 >8192px 会读不了,分屏滚动)。核查:开头/首操作前画面、每个关键状态、**结尾画面**(重点!结尾停留的画面必须在视频时间范围内)。
-- **判据**:开头与结尾画面均正确、关键交互帧齐全;任何缺帧/截断 → 回到第 5-6 阶段重录。
+- **判据**:开头与结尾画面均正确、关键交互帧齐全;任何缺帧/截断(或验证页卡住不显示 `DONE`)→ 回到第 5-6 阶段重录。
 
 ## 关键环境事实
 

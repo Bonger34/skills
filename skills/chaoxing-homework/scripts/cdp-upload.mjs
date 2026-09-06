@@ -132,6 +132,13 @@ async function main() {
     if (chk.hasCloud) break;
   }
   console.log(JSON.stringify({ content: contentCheck }));
+  // 上传判据(与 SKILL.md 一致):hasCloud 必须达成;否则以非零退出码提示自动化
+  let ok = false;
+  try { ok = JSON.parse(contentCheck).hasCloud === true; } catch (e) { ok = false; }
+  if (!ok) {
+    console.log(JSON.stringify({ err: 'upload timeout, hasCloud not reached' }));
+    process.exit(1);
+  }
   process.exit(0);
 }
 main().catch(e => { console.error('ERR', e.message); process.exit(1); });
