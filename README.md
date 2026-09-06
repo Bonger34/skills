@@ -30,7 +30,8 @@ in your own environment before relying on it.
   (`doHomeWorkNew` / `reediter`), write the answer text, inject a zip/rar
   attachment through the UEditor real-mouse flow, submit, and verify
   (`submit=true`, status 待批阅). No private machine paths; configure the
-  `<placeholder>`s once before first use.
+  configuration `<placeholder>`s once before first use (runtime values like
+  `<URL>`/`<local>` are derived per run, not configured).
 - [./skills/android-offline-build](./skills/android-offline-build) — build a
   signed Android APK without Gradle (aapt2 → JDK8 javac vs android.jar → d8 →
   zipalign → apksigner), with per-step completion criteria and the

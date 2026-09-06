@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 # ====== 配置(替换为你的值) ======
 $SDK      = "<ANDROID_HOME>"            # Android SDK 根目录
 $BT       = "$SDK\build-tools\<BUILD_TOOLS>"     # 如 36.0.0
-$PLATFORM = "$SDK\platforms\android-XX\android.jar"  # 与 targetSdk 对应
+$PLATFORM = "$SDK\platforms\android-XX\android.jar"  # 把 android-XX 换成实际 API 目录(如 android-36;须与 targetSdk 兼容)
 $JAVAC    = "<JAVA8_HOME>\bin\javac.exe"   # JDK 8
 $JDK21    = "<JAVA21_HOME>"                # JDK 11+ (d8 用)
 $APK      = "app"                           # 产物名(如 app7)
@@ -17,7 +17,7 @@ $PROJ = $PSScriptRoot                     # 脚本所在目录 = 项目根
 $RES  = "$PROJ\res"
 $SRC  = "$PROJ\src"
 $OUT  = "$PROJ\build"
-# ====== 签名(debug 密钥;私有库请改 KEYSTORE_PASS) ======
+# ====== 签名(debug 密钥;私有库请改 KEYSTORE_PASS;多别名库加 --ks-key-alias <alias>) ======
 $KS     = "<KEYSTORE>"
 $KSPASS = "<KEYSTORE_PASS>"                # debug 密钥库默认 android
 

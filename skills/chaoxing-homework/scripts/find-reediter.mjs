@@ -96,8 +96,8 @@ async function main() {
     console.log('--- depth', r.depth, '|', r.tag, '|', r.txt);
     console.log('  url:', r.url);
     console.log('  onclick:', r.onclick);
-    console.log('  href:', r.href);
-    console.log('  parent:', (r.parentHTML || '').replace(/\s+/g, ' '));
+    console.log('  href:', r.href + (r.href.length >= 300 ? ' [truncated]' : ''));
+    console.log('  parent:', (r.parentHTML || '').replace(/\s+/g, ' ') + (r.parentHTML.length >= 300 ? ' [truncated]' : ''));
   }
   ws.close();
 }

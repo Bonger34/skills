@@ -1,6 +1,7 @@
 ---
 name: chaoxing-homework
 description: "Submit or revise a homework assignment on Chaoxing (超星学习通, chaoxing.com): enter the work editor (doHomeWorkNew / reediter), write the answer text, upload a zip/rar attachment, submit, and verify (submit=true, status 待批阅). Use when the user mentions 学习通/Chaoxing homework, 作业提交/修改答案, doHomeWorkNew, uploading an assignment attachment, or asks to submit or re-deliver a course assignment artifact. Prefer it over generic web-automation when the target is a Chaoxing work page with the UEditor attachment flow."
+license: MIT. LICENSE.txt
 ---
 
 # 学习通作业提交(chaoxing-homework)
@@ -30,7 +31,7 @@ description: "Submit or revise a homework assignment on Chaoxing (超星学习�
 
 - 前置:会话存活、登录态有效;**所有命令带 `--session <SESSION_NAME>`**,否则会连到空 default 实例。
 - 课程页(`studentstudy` URL,chapterId 指向目标章节点)右侧目录点作业,或用 `getTeacherAjax('<COURSE_ID>','<CLASS_ID>','<chapterId>')` 切章节——载体为课程页 tab 的 `eval`(如 `agent-browser --session <SESSION_NAME> eval "getTeacherAjax('<COURSE_ID>','<CLASS_ID>','<chapterId>'); 'ok'"`);chapterId 从目录节点的 `id="cur<xx>"` 或点击后的 URL 提取。
-- 作业详情在 iframe 里,顶层 DOM 搜不到"修改答案"链接 → 运行 `node scripts/find-reediter.mjs <CDP_URL> [<COURSE_ID>]`(递归 iframe 树,自动 attach+enable+walk;多课程页时传 courseId 精确选页),输出该链接的完整 URL 与 `onclick="reediter()"`。编辑页 URL 在输出的 **`href` 或 `parentHTML` 字段**(`doHomeWorkNew?workAnswerId=...&workId=...&enc=...`)。
+- 作业详情在 iframe 里,顶层 DOM 搜不到"修改答案"链接 → 在**技能目录下**运行 `node scripts/find-reediter.mjs <CDP_URL> [<COURSE_ID>]`(先 `cd` 到技能目录,脚本路径相对 cwd;递归 iframe 树,自动 attach+enable+walk;多课程页时传 courseId 精确选页),输出该链接的完整 URL 与 `onclick="reediter()"`。编辑页 URL 在输出的 **`href` 或 `parentHTML` 字段**(`doHomeWorkNew?workAnswerId=...&workId=...&enc=...`)。
 - **判据**:取到含 `doHomeWorkNew?courseId=...&workAnswerId=...&workId=...` 的完整 URL,且 workId/workAnswerId 与题目页一致。
 
 ### 2. 打开编辑页并激活编辑器
@@ -47,7 +48,7 @@ description: "Submit or revise a homework assignment on Chaoxing (超星学习�
 
 ### 4. 注入附件压缩包
 
-- 运行 `node scripts/cdp-upload.mjs <CDP_URL> <zip或rar路径> [workAnswerId]`:
+- 运行 `node scripts/cdp-upload.mjs <CDP_URL> <zip或rar路径> [workAnswerId]`(同样在**技能目录下**运行,路径相对 cwd):
   - 脚本内部用 CDP 真实鼠标(mouseMoved→Pressed→Released)点 UEditor 附件按钮 `.edui-for-attachment_new`(element.click 无效)。
   - 面板打开后递归找隐藏 `input[type=file].webuploader-element-invisible`(可能在 iframe 内)→ 表达式**返回元素节点本身**(returnByValue:false)拿 objectId → `DOM.setFileInputFiles`。
   - 第三参 workAnswerId 用于多作业 tab 残留时区分目标(必须与第 1 步 URL 中的 workAnswerId 一致,否则会注入到旧作业!)。
@@ -76,4 +77,4 @@ description: "Submit or revise a homework assignment on Chaoxing (超星学习�
 | 成功标志 | URL `submit=true`;状态"待批阅" |
 | 多 tab 残留 | cdp-upload.mjs 第三参数传 workAnswerId |
 
-网页操作细节(CDP 协议要点、编辑器/附件、打包)与故障速查见 [REFERENCE.md](REFERENCE.md);模拟器录制与 Android 离线构建的深坑见 [../android-demo-recording](../android-demo-recording) / [../android-offline-build](../android-offline-build) 技能(需要时另复制技能夹)。
+网页操作细节(CDP 协议要点、编辑器/附件、打包)与故障速查见 [REFERENCE.md](REFERENCE.md);模拟器录制与 Android 离线构建的深坑见同名技能 **android-demo-recording** / **android-offline-build**(需另复制技能夹;此处不建相对链,保证单夹复制后无断链)。

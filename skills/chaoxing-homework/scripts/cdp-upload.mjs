@@ -34,7 +34,7 @@ function connect(url) {
         else p.res(msg.result);
       }
     };
-    ws.onerror = (e) => reject(new Error('ws error ' + e.message));
+    ws.onerror = (e) => reject(new Error('ws connection failed: ' + ((e && e.message) || 'cannot connect — re-fetch CDP URL with `agent-browser get cdp-url` and retry')));
   });
 }
 

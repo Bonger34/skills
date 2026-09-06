@@ -1,6 +1,7 @@
 ---
 name: android-offline-build
 description: "Build an Android APK offline without Gradle, using the raw SDK toolchain (aapt2 compile/link, JDK8 javac against android.jar, d8, zipalign, apksigner). Use when the user wants to build/rebuild an Android app APK from source on a machine with no Gradle, when a build.ps1-style script is missing or failing, when apksigner silently fails, or whenever an android/* project needs a signed APK produced and verified locally."
+license: MIT. LICENSE.txt
 ---
 
 # Android 离线构建(android-offline-build)
@@ -56,11 +57,12 @@ description: "Build an Android APK offline without Gradle, using the raw SDK too
 
 ```
 $old = $env:JAVA_HOME
-$env:JAVA_HOME = "<JAVA21_HOME>"                            # d8 需要 JDK 11+,JDK8 下会失败
-"<BUILD_TOOLS>/d8.bat" --release --lib "<PLATFORM_JAR>" --min-api 23 --output "<out>/dex" <classes...>
-$env:JAVA_HOME = $old                                      # 用后恢复
+try {
+  $env:JAVA_HOME = "<JAVA21_HOME>"                            # d8 需要 JDK 11+,JDK8 下会失败
+  "<BUILD_TOOLS>/d8.bat" --release --lib "<PLATFORM_JAR>" --min-api 23 --output "<out>/dex" <classes...>
+} finally { $env:JAVA_HOME = $old }                           # 用后恢复(与模板一致)
 ```
-- **判据**:`dex/classes.dex` 生成;`--min-api` 与项目 minSdk 一致;JAVA_HOME 已恢复(模板用 try/finally 保证)。
+- **判据**:`dex/classes.dex` 生成;`--min-api` 与项目 minSdk 一致;JAVA_HOME 已恢复(片段与模板都用 try/finally 保证)。
 
 ### 5. 合并 dex
 

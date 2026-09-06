@@ -1,6 +1,7 @@
 ---
 name: android-demo-recording
 description: "Record a clean demo video of an Android app on an emulator for course assignments or demos: boot and configure the emulator (no software keyboard / Chinese text input via ADBKeyboard), collect tap coordinates with uiautomator, drive the app through a scripted sequence while screenrecord runs, then verify the result frame-by-frame. Use when the user wants a demo video, 演示视频, screen recording of an Android app, emulator recording, or troubleshooting blank/broken recordings (SystemUI ANR eating input, keyboard shifting taps, video cut off before the ending)."
+license: MIT. LICENSE.txt
 ---
 
 # Android 演示录制(android-demo-recording)
@@ -28,7 +29,7 @@ description: "Record a clean demo video of an Android app on an emulator for cou
 ```
 <ANDROID_HOME>/emulator/emulator.exe -avd <AVD_NAME> -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -no-window
 ```
-后台运行、输出重定向到日志(**不要接管道**);等待 `getprop sys.boot_completed`=`1`。`-no-window` 下无人屏幕可看,画面只能靠 `screencap` 截图/dump/帧验证页核验。
+后台运行、输出重定向到日志(**不要接管道**);等待就绪:`<ADB> wait-for-device` 后轮询 `getprop sys.boot_completed`(循环至输出 `1`)。`-no-window` 下无人屏幕可看,画面只能靠 `screencap` 截图/dump/帧验证页核验。
 - **判据**:`<ADB> devices` 显示 `device`(非 offline)+ boot_completed=1。
 
 ### 2. 系统稳定与环境配置
@@ -83,7 +84,7 @@ description: "Record a clean demo video of an Android app on an emulator for cou
 <ADB> pull /sdcard/demo.mp4 <local>
 ```
 - `<N>` 取值自第 6 阶段判据公式(≥ 序列总耗时 × 1.2;分段录制时各段分别取值)。
-- 验证页 `src` 默认相对上一级 `../demo.mp4`:把视频放到工作目录,再改 `scripts/durcheck.html` / `scripts/vidframe.html` 的 `src`(或把视频放到技能根目录)。
+- `../demo.mp4` 是相对 `scripts/` 上一级(技能根目录)的路径:把视频放到**技能根目录**即可不改代码;想用别处文件时改两个验证页的 `src`。
 - **判据**:拉回后立刻看时长(见第 8 阶段);时长不足预期或疑被截断 → 加大 time-limit 重录。
 
 ### 8. 时长校验与逐帧验证
