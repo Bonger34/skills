@@ -1,7 +1,6 @@
 ---
 name: chaoxing-homework
-description: Submit or revise a homework assignment on Chaoxing (超星学习通, chaoxing.com): enter the work editor (doHomeWorkNew / reediter), write the answer text, upload a zip/rar attachment, submit, and verify (submit=true, status 待批阅). Use when the user mentions 学习通/Chaoxing homework, 作业提交/修改答案, doHomeWorkNew, uploading an assignment attachment, or asks to submit or re-deliver a course assignment artifact. Prefer it over generic web-automation when the target is a Chaoxing work page with the UEditor attachment flow.
-license: MIT
+description: "Submit or revise a homework assignment on Chaoxing (超星学习通, chaoxing.com): enter the work editor (doHomeWorkNew / reediter), write the answer text, upload a zip/rar attachment, submit, and verify (submit=true, status 待批阅). Use when the user mentions 学习通/Chaoxing homework, 作业提交/修改答案, doHomeWorkNew, uploading an assignment attachment, or asks to submit or re-deliver a course assignment artifact. Prefer it over generic web-automation when the target is a Chaoxing work page with the UEditor attachment flow."
 ---
 
 # 学习通作业提交(chaoxing-homework)
